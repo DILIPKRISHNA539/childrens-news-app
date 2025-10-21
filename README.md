@@ -46,7 +46,7 @@ Reuters World
 
 │ Gemini 2.5 AI   │
 │  Simplification │
-└────────┬────────┘
+
          │
          ▼
 
@@ -264,5 +264,6 @@ Firecrawl - Web scraping API
 LiteLLM - Unified LLM interface
 BeautifulSoup - HTML parsing
 Feedparser - RSS feed parsing
+
 
 
