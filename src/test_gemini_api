@@ -1,0 +1,100 @@
+"""
+Test script to debug Google Gemini API connection (Direct API)
+"""
+
+import os
+from dotenv import load_dotenv
+
+# Load environment
+load_dotenv()
+
+print("="*70)
+print("🔍 GOOGLE GEMINI API DEBUGGER (Direct API)")
+print("="*70)
+
+# Import config *after* load_dotenv()
+try:
+    from config import GOOGLE_API_KEY, GEMINI_MODEL_NAME
+    print("✅ Successfully loaded config.py")
+except ImportError as e:
+    print(f"❌ Failed to load config.py: {e}")
+    print("   Ensure config.py is in the same directory or src/ path.")
+    exit(1)
+
+
+# Check 1: Environment variable
+print("\n1️⃣  Checking GOOGLE_API_KEY...")
+if GOOGLE_API_KEY and GOOGLE_API_KEY.startswith("AIzaSy"):
+    print(f"   ✅ Found: {GOOGLE_API_KEY[:7]}...{GOOGLE_API_KEY[-5:]}")
+else:
+    print("   ❌ NOT FOUND or invalid! Key should start with 'AIzaSy'.")
+    print("      Add GOOGLE_API_KEY to your .env file.")
+    exit(1)
+
+# Check 2: Check Model Name
+print("\n2️⃣  Checking GEMINI_MODEL_NAME...")
+if GEMINI_MODEL_NAME:
+    print(f"   ✅ Model to test: '{GEMINI_MODEL_NAME}'")
+else:
+    print("   ❌ GEMINI_MODEL_NAME is not set in your .env file or config.py.")
+    exit(1)
+
+# Check 3: Direct Google API test
+print("\n3️⃣  Testing direct connection with 'google-generativeai'...")
+try:
+    import google.generativeai as genai
+    from google.api_core.exceptions import NotFound, PermissionDenied, ResourceExhausted
+    print("   ✅ 'google-generativeai' is installed.")
+    
+    genai.configure(api_key=GOOGLE_API_KEY)
+    
+    print(f"\n   Testing model: '{GEMINI_MODEL_NAME}'")
+    model = genai.GenerativeModel(GEMINI_MODEL_NAME)
+    response = model.generate_content("Hello! How are you today?")
+    
+    print(f"   ✅ SUCCESS! Response: '{response.text.strip()}'")
+    
+except ImportError:
+    print("   ❌ 'google-generativeai' not installed.")
+    print("      Install with: pip install google-generativeai")
+    exit(1)
+except NotFound as e:
+    print(f"   ❌ FAILED: Model not found. '{GEMINI_MODEL_NAME}' is likely incorrect.")
+    print(f"      Error details: {e}")
+except PermissionDenied as e:
+    print(f"   ❌ FAILED: Permission Denied. Your API key is invalid or lacks permissions.")
+    print(f"      Error details: {e}")
+except ResourceExhausted as e:
+    print(f"   ❌ FAILED: Rate limit hit or quota exhausted.")
+    print(f"      Error details: {e}")
+except Exception as e:
+    # Catch other errors
+    print(f"   ❌ Direct API call FAILED: {str(e)}")
+
+# Check 4: Recommendations
+print("\n" + "="*70)
+print("📋 RECOMMENDATIONS")
+print("="*70)
+
+print("""
+If all checks passed, you are ready to run the pipeline!
+
+If tests failed, try these solutions:
+
+1️⃣  VERIFY YOUR API KEY:
+    - Go to: https://aistudio.google.com/app/apikey
+    - Ensure the key is for a project with the 'Generative Language API' enabled.
+    - Copy the FULL key (it must start with AIzaSy...).
+
+2️⃣  VERIFY YOUR MODEL NAME:
+    - Check your `GEMINI_MODEL_NAME` in your .env file.
+    - Common models: "gemini-1.5-flash" or "gemini-2.5-flash-lite" (if you have access).
+
+3️⃣  UPDATE YOUR PACKAGES:
+    - Run: pip install --upgrade google-generativeai
+
+4️⃣  CHECK API RESTRICTIONS:
+    - In your Google Cloud project, ensure the API key has no restrictions
+      (like IP address or application restrictions) that might block your script.
+""")
+print("="*70)

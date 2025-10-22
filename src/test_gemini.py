@@ -53,7 +53,6 @@ for model in models_to_test:
             messages=[{"role": "user", "content": "Hello! How are you today?"}],
             max_tokens=20,
             timeout=15 
-            api_key=api_key
         )
         
         result = response.choices[0].message.content.strip()

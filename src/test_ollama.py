@@ -1,5 +1,6 @@
 """
 A simple script to test the connection to a local Ollama model using the litellm library.
+
 """
 
 print("="*70)

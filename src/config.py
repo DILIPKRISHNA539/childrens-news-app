@@ -21,7 +21,8 @@ GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', '')
 # LITELLM MODEL CONFIGURATION
 # ============================================================
 # Updated to Gemini 2.5 Flash (latest as of 2025, FREE tier)
-LITELLM_MODEL = os.getenv('LITELLM_MODEL', 'gemini-2.5-flash-lite')
+# LITELLM_MODEL = os.getenv('LITELLM_MODEL', 'gemini-2.5-flash-lite')
+GEMINI_MODEL_NAME = os.getenv('GEMINI_MODEL_NAME', 'gemini-2.5-flash-lite')
 
 # ============================================================
 # MAIN NEWS SOURCES FOR POC (3 sources)

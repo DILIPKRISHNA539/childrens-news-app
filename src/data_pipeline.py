@@ -1,20 +1,20 @@
 """
 Main Data Pipeline for Children's News App
-FINAL VERSION - Integrated with Gemini 2.5 Hybrid Processor
+
 """
 
 import sys
 import json
 from datetime import datetime
 from extractors import DataExtractor
-from processors import DataCleaner, GeminiHybridProcessor  # ✅ Updated import
+from processors import DataCleaner, GeminiHybridProcessor
 from database import NewsDatabase
 from config import (
     RAW_DATA_PATH,
     CLEANED_DATA_PATH,
     PROCESSED_DATA_PATH,
     GOOGLE_API_KEY,
-    LITELLM_MODEL
+    GEMINI_MODEL_NAME  # <-- Use our new config variable
 )
 
 
@@ -24,14 +24,16 @@ class NewsPipeline:
     def __init__(self):
         self.extractor = DataExtractor()
         self.cleaner = DataCleaner()
-        # ✅ Use real Gemini processor, not mock
-        if not LITELLM_MODEL or not GOOGLE_API_KEY:
+        
+        # ✅ Updated check for Direct Google API
+        if not GEMINI_MODEL_NAME or not GOOGLE_API_KEY:
             raise RuntimeError(
-                "Gemini processor requires LiteLLM and GOOGLE_API_KEY.\n"
-                "Install: pip install litellm\n"
-                "Set key in .env: GOOGLE_API_KEY=your_key"
+                "Gemini processor requires GEMINI_MODEL_NAME and GOOGLE_API_KEY.\n"
+                "Check your config.py and .env file."
             )
-        self.processor = GeminiHybridProcessor()  # ✅ Real processor
+        
+        # This now works because your processors.py is correctly updated
+        self.processor = GeminiHybridProcessor()
         self.db = NewsDatabase()
 
         self.raw_articles = []
@@ -69,8 +71,8 @@ class NewsPipeline:
 
             self.cleaner.save_cleaned_data(self.cleaned_articles, CLEANED_DATA_PATH)
 
-            # Step 3: AI Processing with Gemini 2.5 (Hybrid)
-            print("\n🤖 STEP 3: GEMINI 2.5 HYBRID AI PROCESSING")
+            # Step 3: AI Processing with Gemini (Hybrid)
+            print("\n🤖 STEP 3: GEMINI HYBRID AI PROCESSING")
             print("-" * 70)
             self.processed_articles = self.processor.process_all(self.cleaned_articles)
             self.processor.save_processed_data(self.processed_articles, PROCESSED_DATA_PATH)
@@ -225,7 +227,7 @@ def run_database_only():
 
 if __name__ == "__main__":
     print("\n" + "=" * 70)
-    print("   CHILDREN'S NEWS APP - DATA PIPELINE (Gemini 2.5 FINAL)")
+    print("   CHILDREN'S NEWS APP - DATA PIPELINE (Gemini Direct API)")
     print("=" * 70)
 
     if len(sys.argv) > 1:
@@ -245,10 +247,10 @@ if __name__ == "__main__":
         else:
             print("\n❌ Invalid mode. Use: extract, process, database, or full")
             print("\nUsage:")
-            print("  python data_pipeline.py full      - Run complete pipeline")
-            print("  python data_pipeline.py extract   - Run extraction only")
-            print("  python data_pipeline.py process   - Run processing only")
-            print("  python data_pipeline.py database  - Run database storage only")
+            print("  python src/data_pipeline.py full      - Run complete pipeline")
+            print("  python src/data_pipeline.py extract   - Run extraction only")
+            print("  python src/data_pipeline.py process   - Run processing only")
+            print("  python src/data_pipeline.py database  - Run database storage only")
     else:
         print("\n▶️  Running COMPLETE PIPELINE (default)")
         pipeline = NewsPipeline()
